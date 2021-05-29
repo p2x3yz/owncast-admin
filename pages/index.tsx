@@ -9,6 +9,7 @@ import Offline from './offline-notice';
 import { LOGS_WARN, fetchData, FETCH_INTERVAL } from '../utils/apis';
 import { formatIPAddress, isEmptyObject } from '../utils/format';
 import NewsFeed from '../components/news-feed';
+import Dashboard from '../components/dashboard';
 
 function streamDetailsFormatter(streamDetails) {
   return (
@@ -66,7 +67,8 @@ export default function Home() {
   }
 
   if (!broadcaster) {
-    return <Offline logs={logsData} config={configData} />;
+    return <Dashboard />;
+    // return <Offline logs={logsData} config={configData} />;
   }
 
   // map out settings
@@ -110,66 +112,7 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      <div className="sections-container">
-        <div className="online-status-section">
-          <Card size="small" type="inner" className="online-details-card">
-            <Row gutter={[16, 16]} align="middle">
-              <Col span={8} sm={24} md={8}>
-                <Statistic
-                  title={`Stream started ${formatRelative(broadcastDate, Date.now())}`}
-                  value={formatDistanceToNow(broadcastDate)}
-                  prefix={<ClockCircleOutlined />}
-                />
-              </Col>
-              <Col span={8} sm={24} md={8}>
-                <Statistic title="Viewers" value={viewerCount} prefix={<UserOutlined />} />
-              </Col>
-              <Col span={8} sm={24} md={8}>
-                <Statistic
-                  title="Peak viewer count"
-                  value={sessionPeakViewerCount}
-                  prefix={<UserOutlined />}
-                />
-              </Col>
-            </Row>
-          </Card>
-        </div>
-
-        <Row gutter={[16, 16]} className="section stream-details-section">
-          <Col className="stream-details" span={12} sm={24} md={24} lg={12}>
-            <Card
-              size="small"
-              title="Outbound Stream Details"
-              type="inner"
-              className="outbound-details"
-            >
-              {videoQualitySettings}
-            </Card>
-
-            <Card size="small" title="Inbound Stream Details" type="inner">
-              <Statistic
-                className="stream-details-item"
-                title="Input"
-                value={`${encoder} ${formatIPAddress(remoteAddr)}`}
-              />
-              <Statistic
-                className="stream-details-item"
-                title="Inbound Video Stream"
-                value={streamDetails}
-                formatter={streamDetailsFormatter}
-              />
-              <Statistic
-                className="stream-details-item"
-                title="Inbound Audio Stream"
-                value={streamAudioDetailString}
-              />
-            </Card>
-          </Col>
-          <Col span={12} xs={24} sm={24} md={24} lg={12}>
-            <NewsFeed />
-          </Col>
-        </Row>
-      </div>
+      <Dashboard />
       <br />
       <LogTable logs={logsData} pageSize={5} />
     </div>
