@@ -20,6 +20,7 @@ import '../styles/chat.scss';
 import '../styles/pages.scss';
 import '../styles/dashboard.scss';
 
+import '../styles/offline-notice.scss';
 
 import { AppProps } from 'next/app';
 import ServerStatusProvider from '../utils/server-status-context';
