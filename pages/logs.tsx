@@ -1,34 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import LogTable from '../components/log-table';
 
-import { LOGS_ALL, fetchData } from '../utils/apis';
-
-const FETCH_INTERVAL = 5 * 1000; // 5 sec
+import { StreamLifecycleContext } from '../utils/stream-lifecycle-context';
 
 export default function Logs() {
-  const [logs, setLogs] = useState([]);
-
-  const getInfo = async () => {
-    try {
-      const result = await fetchData(LOGS_ALL);
-      setLogs(result);
-    } catch (error) {
-      console.log('==== error', error);
-    }
-  };
-
-  useEffect(() => {
-    let getStatusIntervalId = null;
-
-    setInterval(getInfo, FETCH_INTERVAL);
-    getInfo();
-
-    getStatusIntervalId = setInterval(getInfo, FETCH_INTERVAL);
-    // returned function will be called on component unmount
-    return () => {
-      clearInterval(getStatusIntervalId);
-    };
-  }, []);
-
-  return <LogTable logs={logs} pageSize={20} />;
+  // get logs from context
+  const streamLifecycle = useContext(StreamLifecycleContext);
+  const { logsAll } = streamLifecycle || {};
+  
+  return <LogTable logs={logsAll} pageSize={20} />;
 }

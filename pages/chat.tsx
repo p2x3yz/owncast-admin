@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Table, Typography, Tooltip, Button } from 'antd';
 import { CheckCircleFilled, ExclamationCircleFilled } from '@ant-design/icons';
 import classNames from 'classnames';
 import { ColumnsType } from 'antd/es/table';
 import format from 'date-fns/format';
 
-import { CHAT_HISTORY, fetchData, FETCH_INTERVAL, UPDATE_CHAT_MESSGAE_VIZ } from '../utils/apis';
+import { fetchData, UPDATE_CHAT_MESSGAE_VIZ } from '../utils/apis';
 import { MessageType } from '../types/chat';
 import { isEmptyObject } from '../utils/format';
 import MessageVisiblityToggle from '../components/message-visiblity-toggle';
+import { StreamLifecycleContext } from '../utils/stream-lifecycle-context';
 
 const { Title } = Typography;
 
@@ -38,39 +39,24 @@ function createUserNameFilters(messages: MessageType[]) {
 export const OUTCOME_TIMEOUT = 3000;
 
 export default function Chat() {
+  const streamLifecycle = useContext(StreamLifecycleContext);
+  const { chatMessages } = streamLifecycle || {};
+  
   const [messages, setMessages] = useState([]);
   const [selectedRowKeys, setSelectedRows] = useState([]);
   const [bulkProcessing, setBulkProcessing] = useState(false);
   const [bulkOutcome, setBulkOutcome] = useState(null);
   const [bulkAction, setBulkAction] = useState('');
   let outcomeTimeout = null;
-  let chatReloadInterval = null;
-
-  const getInfo = async () => {
-    try {
-      const result = await fetchData(CHAT_HISTORY, { auth: true });
-      if (isEmptyObject(result)) {
-        setMessages([]);
-      } else {
-        setMessages(result);
-      }
-    } catch (error) {
-      console.log('==== error', error);
-    }
-  };
 
   useEffect(() => {
-    getInfo();
-
-    chatReloadInterval = setInterval(() => {
-      getInfo();
-    }, FETCH_INTERVAL);
+    // put messages from context into local state for use
+    setMessages(chatMessages);
 
     return () => {
       clearTimeout(outcomeTimeout);
-      clearTimeout(chatReloadInterval);
     };
-  }, []);
+  }, [chatMessages.length]);
 
   const nameFilters = createUserNameFilters(messages);
 

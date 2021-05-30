@@ -1,9 +1,10 @@
 import { BulbOutlined, LaptopOutlined, SaveOutlined } from '@ant-design/icons';
 import { Row, Col, Typography } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { fetchData, FETCH_INTERVAL, HARDWARE_STATS } from '../utils/apis';
 import Chart from '../components/chart';
 import StatisticItem from '../components/statistic';
+import { StreamLifecycleContext } from '../utils/stream-lifecycle-context';
 
 // TODO: FIX TS WARNING FROM THIS.
 // interface TimedValue {
@@ -12,33 +13,15 @@ import StatisticItem from '../components/statistic';
 // }
 
 export default function HardwareInfo() {
-  const [hardwareStatus, setHardwareStatus] = useState({
-    cpu: [], // Array<TimedValue>(),
-    memory: [], // Array<TimedValue>(),
-    disk: [], // Array<TimedValue>(),
-    message: '',
-  });
+  const streamLifecycle = useContext(StreamLifecycleContext);
+  const { hardwareStatus } = streamLifecycle || {};
 
-  const getHardwareStatus = async () => {
-    try {
-      const result = await fetchData(HARDWARE_STATS);
-      setHardwareStatus({ ...result });
-    } catch (error) {
-      setHardwareStatus({ ...hardwareStatus, message: error.message });
-    }
-  };
-
-  useEffect(() => {
-    let getStatusIntervalId = null;
-
-    getHardwareStatus();
-    getStatusIntervalId = setInterval(getHardwareStatus, FETCH_INTERVAL); // runs every 1 min.
-
-    // returned function will be called on component unmount
-    return () => {
-      clearInterval(getStatusIntervalId);
-    };
-  }, []);
+  // const [hardwareStatus, setHardwareStatus] = useState({
+  //   cpu: [], // Array<TimedValue>(),
+  //   memory: [], // Array<TimedValue>(),
+  //   disk: [], // Array<TimedValue>(),
+  //   message: '',
+  // });
 
   if (!hardwareStatus.cpu) {
     return null;

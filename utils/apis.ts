@@ -40,7 +40,7 @@ export const LOGS_WARN = `${API_LOCATION}logs/warnings`;
 // Get chat history
 export const CHAT_HISTORY = `${API_LOCATION}chat/messages`;
 
-// Get chat history
+// Update chat message
 export const UPDATE_CHAT_MESSGAE_VIZ = `${NEXT_PUBLIC_API_HOST}api/admin/chat/updatemessagevisibility`;
 
 // Get all access tokens
