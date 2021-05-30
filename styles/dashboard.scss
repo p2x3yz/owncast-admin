@@ -1,0 +1,77 @@
+
+// when online to show this dashboard, override padding set by main container
+.app-container.online {
+  .main-content-container {
+    .home-container {
+      margin: -2em -3em -3em;
+    }
+  }
+}
+
+.dashboard {
+  position: relative;
+  height: 80vh;
+  z-index: 9999;
+
+  .chat-messages {
+    padding: .5em;
+    background-color: var(--gray);
+    overflow: auto;
+    height: 60vh;
+  }
+  
+}
+
+
+
+.chat-sender {
+  position: fixed;
+  width: 100%;
+  background-color: purple;
+  padding: 5em;
+  bottom: 0;
+}
+
+
+
+.chat-message {
+  padding: 1em;
+  font-size: 1rem;
+
+  &:nth-child(odd) {
+    background: var(--black-15);
+  }
+  .message-contents {
+    font-size: 1em;
+    overflow: auto;
+    img {
+      position: relative;
+      margin-top: -5px;
+      width: 3rem;
+      padding: 0.25rem;
+    }
+    p {
+      margin: 0;
+    }
+  }
+  .author {
+    font-weight: 500;
+    font-size: 1em;
+    color: #f60;  // TEMP
+    display: inline-flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .timestamp {
+    font-size: .75em;
+    color: var(--white-25);
+    margin-left: 1em;
+    display: inline-block;
+    white-space: nowrap;
+    &::before {
+      content: ' ';
+    }
+  }
+
+}
