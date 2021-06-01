@@ -20,6 +20,7 @@ import ChatMessages from './chat';
 import { ServerStatusContext } from '../../utils/server-status-context';
 import Chart from '../chart';
 import { StreamLifecycleContext } from '../../utils/stream-lifecycle-context';
+import VideoEmbed from './video';
 
 const { Title } = Typography;
 
@@ -31,12 +32,15 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
+      <Title>You are Live!</Title>
+      <Typography>Here's what's happening on your stream.</Typography>
       <Row gutter={[16, 16]} className="section">
         <Col className="messages-column" span={12} sm={24} md={24} lg={12}>
-          <Title>You are Live!</Title>
-          <Typography>Here's what's happening on your stream.</Typography>
           
-          <div>video stream</div>
+          
+          <div className="video-embed-container">
+            <VideoEmbed />
+          </div>
           <div>
             <Chart title="Viewers" data={viewersOverTime} color="#2087E2" unit="" />
           </div>
@@ -49,7 +53,7 @@ export default function Dashboard() {
         </Col>
       </Row>
 
-      <div className="chat-sender"></div>
+      {/* <div className="chat-sender"></div> */}
     </div>
   );
 }

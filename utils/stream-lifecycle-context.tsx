@@ -20,7 +20,6 @@ import { ServerStatusContext } from './server-status-context';
 type SetterMethod = (data: any) => void;
 
 async function getAndSetData(apiUrl: string, setDataCallback: SetterMethod) {
-  console.log("fetch ", apiUrl)
   try {
     const result = await fetchData(apiUrl);
     setDataCallback(result);
