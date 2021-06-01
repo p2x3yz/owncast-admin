@@ -24,11 +24,9 @@ import VideoEmbed from './video';
 
 const { Title } = Typography;
 
-
 export default function Dashboard() {
   const streamLifecycle = useContext(StreamLifecycleContext);
   const { viewersOverTime } = streamLifecycle || {};
-
 
   return (
     <div className="dashboard">
@@ -36,8 +34,6 @@ export default function Dashboard() {
       <Typography>Here's what's happening on your stream.</Typography>
       <Row gutter={[16, 16]} className="section">
         <Col className="messages-column" span={12} sm={24} md={24} lg={12}>
-          
-          
           <div className="video-embed-container">
             <VideoEmbed />
           </div>
@@ -46,7 +42,6 @@ export default function Dashboard() {
           </div>
           <div>health?</div>
           <div>viewers list?</div>
-
         </Col>
         <Col className="utils-column" span={12} xs={24} sm={24} md={24} lg={12}>
           <ChatMessages />
