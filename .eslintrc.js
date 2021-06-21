@@ -3,13 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: [
-    'plugin:react/recommended',
-    'airbnb',
-    'prettier',
-    'prettier/@typescript-eslint',
-    'prettier/react',
-  ],
+  extends: ['plugin:react/recommended', 'airbnb', 'prettier'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
@@ -31,7 +25,7 @@ module.exports = {
     'no-use-before-define': [0],
     '@typescript-eslint/no-use-before-define': [1],
 
-    "react/jsx-no-target-blank": [1, { "allowReferrer": false, "enforceDynamicLinks": 'always' }],
+    'react/jsx-no-target-blank': [1, { allowReferrer: false, enforceDynamicLinks: 'always' }],
     'import/extensions': [
       'error',
       'ignorePackages',
