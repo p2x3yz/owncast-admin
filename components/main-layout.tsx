@@ -29,6 +29,7 @@ import TextFieldWithSubmit from './config/form-textfield-with-submit';
 import { TEXTFIELD_PROPS_STREAM_TITLE } from '../utils/config-constants';
 
 import { UpdateArgs } from '../types/config-section';
+import VideoEmbed from './dashboard/video';
 
 export default function MainLayout(props) {
   const { children } = props;
@@ -190,6 +191,7 @@ export default function MainLayout(props) {
             <Link href="/help">Help</Link>
           </Menu.Item>
         </Menu>
+        <VideoEmbed />
       </Sider>
 
       <Layout className="layout-main">
