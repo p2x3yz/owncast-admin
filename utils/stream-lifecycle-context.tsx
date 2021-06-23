@@ -5,9 +5,9 @@ For lack of a better name, this is a provider to get Viewers, Connected Clients,
 */
 
 import React, { useState, useEffect, useContext } from 'react';
-import {fetchData,
+import {
+  fetchData,
   FETCH_INTERVAL,
-
   VIEWERS_OVER_TIME,
   CONNECTED_CLIENTS,
   HARDWARE_STATS,
@@ -24,17 +24,16 @@ async function getAndSetData(apiUrl: string, setDataCallback: SetterMethod) {
     const result = await fetchData(apiUrl);
     setDataCallback(result);
   } catch (error) {
-    console.log({apiUrl, error});
+    console.log({ apiUrl, error });
   }
 }
 
 export interface HardwareStatus {
-  cpu: [], // Array<TimedValue>(),
-  memory: [], // Array<TimedValue>(),
-  disk: [], // Array<TimedValue>(),
-  message: '',
+  cpu: []; // Array<TimedValue>(),
+  memory: []; // Array<TimedValue>(),
+  disk: []; // Array<TimedValue>(),
+  message: '';
 }
-
 
 export const StreamLifecycleContext = React.createContext({
   chatMessages: [],
@@ -64,12 +63,12 @@ const StreamLifecycleProvider = ({ children }) => {
     getAndSetData(LOGS_ALL, setLogsAll);
     getAndSetData(LOGS_WARN, setLogsWarnings);
     getAndSetData(CHAT_HISTORY, setChatMessages);
-  }
+  };
 
   const clearDataInterval = () => {
     clearInterval(updateDataIntervalId);
     updateDataIntervalId = null;
-  }
+  };
 
   // get the things the first time
   useEffect(() => {
@@ -82,16 +81,14 @@ const StreamLifecycleProvider = ({ children }) => {
       updateDataIntervalId = setInterval(getAllTheThings, FETCH_INTERVAL);
       // returned function will be called on component unmount
       return () => {
-        clearDataInterval()
+        clearDataInterval();
       };
     } else {
       if (updateDataIntervalId) {
-        clearDataInterval()
+        clearDataInterval();
       }
     }
   }, [online]);
-
-
 
   const providerValue = {
     chatMessages,
@@ -102,7 +99,9 @@ const StreamLifecycleProvider = ({ children }) => {
     logsWarnings,
   };
   return (
-    <StreamLifecycleContext.Provider value={providerValue}>{children}</StreamLifecycleContext.Provider>
+    <StreamLifecycleContext.Provider value={providerValue}>
+      {children}
+    </StreamLifecycleContext.Provider>
   );
 };
 

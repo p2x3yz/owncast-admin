@@ -1,5 +1,3 @@
-
-
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import { NEXT_PUBLIC_API_HOST } from '../../utils/apis';
 import useWindowSize from '../../utils/hook-windowresize';
@@ -15,7 +13,7 @@ export default function VideoEmbed() {
   }
 
   const containerRef = useRef<HTMLIFrameElement>(null);
-  // const { width: windowWidth} = useWindowSize();
+  const { width: windowWidth } = useWindowSize();
 
   const [frameHeight, setFrameHeight] = useState(100);
 
@@ -23,11 +21,15 @@ export default function VideoEmbed() {
     // set height of video frame to 16/9 ratio
     const frameWidth = containerRef?.current?.scrollWidth;
     setFrameHeight((frameWidth * 9) / 16);
-  }, []) 
+  }, [windowWidth]);
 
   return (
-    <div className="video-embed-container">
-      <iframe scrolling="no" ref={containerRef} src={LOCAL_EMBED_VIDEO_URL} style={{ height: `${frameHeight}px` }}></iframe>
-    </div>
+    <iframe
+      title="video preview"
+      scrolling="no"
+      ref={containerRef}
+      src={LOCAL_EMBED_VIDEO_URL}
+      style={{ height: `${frameHeight}px` }}
+    />
   );
 }
