@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Table, Typography } from 'antd';
-import { getGithubRelease } from '../utils/apis';
+import { Table, Typography, Button, Divider, Space } from 'antd';
+import {
+  fetchData,
+  getGithubRelease,
+  UPDATER_OPTIONS,
+  upgradeVersionAvailable,
+  STATUS,
+} from '../utils/apis';
+import { AutoUpdateOptions } from '../types/auto-update-options';
 
-const { Title } = Typography;
+import AutoUpdater from '../components/auto-updater';
+
+const { Title, Text } = Typography;
 
 function AssetTable(assets) {
   const data = Object.values(assets) as object[];
@@ -34,14 +43,67 @@ function AssetTable(assets) {
   );
 }
 
-export default function Logs() {
-  const [release, setRelease] = useState({
-    html_url: '',
-    name: '',
-    created_at: null,
-    body: '',
-    assets: [],
-  });
+export default function Upgrade() {
+  const [newVersionNumber, setNewVersionNumber] = useState(null);
+  const [autoUpdateOptions, setAutoUpdateOptions] = useState<AutoUpdateOptions>(null);
+
+  async function checkForUpgrade() {
+    try {
+      const statusResult = await fetchData(STATUS);
+      const { versionNumber } = statusResult;
+
+      // Determine if an upgrade is available given the current version number.
+      const result = '0.0.11'; // await upgradeVersionAvailable(versionNumber);
+      // if (versionNumber !== result) {
+      setNewVersionNumber(result);
+      // }
+    } catch (error) {
+      console.error('==== error', error);
+      setNewVersionNumber(null);
+    }
+  }
+
+  async function getAutoUpdateOptions() {
+    try {
+      const response = await fetchData(UPDATER_OPTIONS);
+      setAutoUpdateOptions(response);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  const [release, setRelease] = useState(null);
+
+  const [showUpdaterModal, setShowUpdaterModal] = useState(false);
+  function enableUpdaterModal() {
+    setShowUpdaterModal(true);
+  }
+
+  function disableUpdaterModal() {
+    setShowUpdaterModal(false);
+  }
+
+  function EnableAutoUpdater() {
+    return (
+      autoUpdateOptions &&
+      autoUpdateOptions.supportsUpdate &&
+      newVersionNumber && (
+        <Space direction="vertical">
+          <Title level={2}>Update to v{newVersionNumber}</Title>
+          Depending on your server configuration some or all of the update process may be
+          accomplished via the web updater.
+          <Button onClick={enableUpdaterModal}>Start Updater</Button>
+          {showUpdaterModal && (
+            <AutoUpdater
+              closeModal={disableUpdaterModal}
+              version={newVersionNumber}
+              options={autoUpdateOptions}
+            />
+          )}
+        </Space>
+      )
+    );
+  }
 
   const getRelease = async () => {
     try {
@@ -54,10 +116,18 @@ export default function Logs() {
 
   useEffect(() => {
     getRelease();
+    getAutoUpdateOptions();
+    checkForUpgrade();
   }, []);
 
-  if (!release) {
-    return null;
+  if (!release || !release.name) {
+    return (
+      <div>
+        <Text type="warning">
+          Error: Unable to fetch the new version. There may be an issue querying Github.
+        </Text>
+      </div>
+    );
   }
 
   return (
@@ -67,6 +137,8 @@ export default function Logs() {
       </Title>
       <Title level={5}>{new Date(release.created_at).toDateString()}</Title>
       <ReactMarkdown>{release.body}</ReactMarkdown>
+      <EnableAutoUpdater />
+      <Divider />
       <h3>Downloads</h3>
       <AssetTable {...release.assets} />
     </div>

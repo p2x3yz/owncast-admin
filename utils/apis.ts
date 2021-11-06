@@ -81,7 +81,14 @@ export const EXTERNAL_ACTIONS = `${API_LOCATION}api/externalactions`;
 
 export const API_YP_RESET = `${API_LOCATION}yp/reset`;
 
-export const TEMP_UPDATER_API = LOGS_ALL;
+// Determine what auto-update options are supported for this instance.
+export const UPDATER_OPTIONS = `${API_LOCATION}update/options`;
+
+// Start the update process.
+export const UPDATER_EXECUTE = `${API_LOCATION}update/start`;
+
+// Force-quit the entire Owncast instance.
+export const INSTANCE_FORCE_QUIT = `${API_LOCATION}update/forcequit`;
 
 const GITHUB_RELEASE_URL = 'https://api.github.com/repos/owncast/owncast/releases/latest';
 
@@ -147,7 +154,13 @@ export async function fetchExternalData(url: string) {
 }
 
 export async function getGithubRelease() {
-  return fetchExternalData(GITHUB_RELEASE_URL);
+  try {
+    const response = await fetchExternalData(GITHUB_RELEASE_URL);
+    return response;
+  } catch (e) {
+    console.error(`GitHub error: ${e}`);
+    return null;
+  }
 }
 
 // Stolen from https://gist.github.com/prenagha/98bbb03e27163bc2f5e4
