@@ -1,11 +1,13 @@
 import { Input, Spin, Button, Space, Modal, Typography } from 'antd';
 import React, { useState, useContext } from 'react';
 import { BaseType } from 'antd/lib/typography/Base';
+import PropTypes from 'prop-types';
 import { UPDATER_EXECUTE, INSTANCE_FORCE_QUIT, STATUS, fetchData } from '../utils/apis';
 import { AlertMessageContext } from '../utils/alert-message-context';
 import { AutoUpdateOptions } from '../types/auto-update-options';
 
 const { Paragraph, Text } = Typography;
+const { TextArea } = Input;
 
 interface Props {
   closeModal: (e) => void;
@@ -17,6 +19,7 @@ enum UpgradeStatus {
   NONE,
   UPDATING,
   UPDATED,
+  FAILED,
 }
 
 // eslint-disable-next-line no-shadow
@@ -29,12 +32,74 @@ enum RestartStatus {
   MANUAL_RESTART_PENDING,
 }
 
-function UpdateIntroduction() {
+function UpdateButton(props) {
+  const { updateState, performUpdate, version } = props;
+
+  if (updateState === UpgradeStatus.UPDATED) {
+    return null;
+  }
+
+  return (
+    <Button onClick={performUpdate} type="primary" loading={updateState === UpgradeStatus.UPDATING}>
+      Begin Update to v{version}
+    </Button>
+  );
+}
+
+UpdateButton.propTypes = {
+  updateState: PropTypes.number.isRequired,
+  performUpdate: PropTypes.func.isRequired,
+  version: PropTypes.string.isRequired,
+};
+
+function UpdateConsole(props) {
+  const { updateState, updateLog, getUpdateStatusText } = props;
+
+  return (
+    <Spin spinning={updateState === UpgradeStatus.UPDATING}>
+      <TextArea
+        autoSize={{ minRows: 7, maxRows: 10 }}
+        value={updateLog}
+        readOnly
+        style={{ backgroundColor: 'rgb(38 38 48)', borderColor: 'rgb(150, 150, 150)' }}
+      />
+      <Text strong>{getUpdateStatusText()}</Text>
+    </Spin>
+  );
+}
+
+UpdateConsole.propTypes = {
+  updateState: PropTypes.number.isRequired,
+  updateLog: PropTypes.string.isRequired,
+  getUpdateStatusText: PropTypes.func.isRequired,
+};
+
+function RestartButton(props) {
+  const { restartStatus, restartButtonPressed } = props;
+
+  const buttonText =
+    restartStatus === RestartStatus.AUTO_RESTART_PENDING ? 'Tell Owncast to Quit' : `Yes I'm sure.`;
+
+  const danger = restartStatus === RestartStatus.AUTO_RESTART_CONFIRM && true;
+  return (
+    <Button type="primary" size="middle" danger={danger} onClick={restartButtonPressed}>
+      {buttonText}
+    </Button>
+  );
+}
+
+const RestartStatusEnumType = PropTypes.oneOf(Object.values(RestartStatus) as RestartStatus[]);
+RestartButton.propTypes = {
+  restartStatus: RestartStatusEnumType.isRequired,
+  restartButtonPressed: PropTypes.func.isRequired,
+};
+
+function UpdateIntroduction(): React.ReactElement {
   return (
     <div>
       <Paragraph>This updater will attempt to update your copy of Owncast.</Paragraph>
       <Paragraph>
-        Like any software update things can go wrong, so it&pos;s suggested you:
+        Like any software update things can go wrong, so it's suggested you:
         <ul style={{ margin: '0.5em' }}>
           <li>Keep backups of your Owncast data.</li>
           <li>
@@ -59,8 +124,6 @@ export default function AutoUpdater(props: Props) {
   const [restartStatus, setRestartStatus] = useState(RestartStatus.NONE);
   const [newVersionNumber, setNewVersionNumber] = useState('');
 
-  const { TextArea } = Input;
-
   const { closeModal, version, options } = props;
 
   function restartRequired() {
@@ -74,6 +137,10 @@ export default function AutoUpdater(props: Props) {
     setUpdateState(UpgradeStatus.UPDATED);
     setRestartStatus(nextRestartStatus);
     restartRequired();
+  }
+
+  function downloadFailed() {
+    setUpdateState(UpgradeStatus.FAILED);
   }
 
   async function performUpdate() {
@@ -111,6 +178,11 @@ export default function AutoUpdater(props: Props) {
 
         const line = new TextDecoder().decode(value);
         setUpdateLog(`${updateLog + line}\n`);
+
+        if (line.includes('Unable to complete update')) {
+          downloadFailed();
+          break;
+        }
       }
     } catch (e) {
       console.error(e);
@@ -125,6 +197,8 @@ export default function AutoUpdater(props: Props) {
         return 'Download complete.';
       case UpgradeStatus.NONE:
         return 'Update Owncast';
+      case UpgradeStatus.FAILED:
+        return 'Update failed. You may want to update manually via the command line.';
       default:
         return '';
     }
@@ -179,22 +253,6 @@ export default function AutoUpdater(props: Props) {
     startCheckOnlineStatus();
   }
 
-  function UpdateButton() {
-    if (updateState === UpgradeStatus.UPDATED) {
-      return null;
-    }
-
-    return (
-      <Button
-        onClick={performUpdate}
-        type="primary"
-        loading={updateState === UpgradeStatus.UPDATING}
-      >
-        Begin Update to v{version}
-      </Button>
-    );
-  }
-
   function restartButtonPressed() {
     switch (restartStatus) {
       case RestartStatus.AUTO_RESTART_PENDING:
@@ -206,34 +264,6 @@ export default function AutoUpdater(props: Props) {
       default:
       // nothing
     }
-  }
-
-  function RestartButton() {
-    const buttonText =
-      restartStatus === RestartStatus.AUTO_RESTART_PENDING
-        ? 'Tell Owncast to Quit'
-        : `Yes I'm sure.`;
-
-    const danger = restartStatus === RestartStatus.AUTO_RESTART_CONFIRM && true;
-    return (
-      <Button type="primary" size="middle" danger={danger} onClick={restartButtonPressed}>
-        {buttonText}
-      </Button>
-    );
-  }
-
-  function UpdateConsole() {
-    return (
-      <Spin spinning={updateState === UpgradeStatus.UPDATING}>
-        <TextArea
-          autoSize={{ minRows: 7, maxRows: 10 }}
-          value={updateLog}
-          readOnly
-          style={{ backgroundColor: 'rgb(38 38 48)', borderColor: 'rgb(150, 150, 150)' }}
-        />
-        <Text strong>{getUpdateStatusText()}</Text>
-      </Spin>
-    );
   }
 
   let restartMessageTextType: BaseType = 'warning';
@@ -254,17 +284,29 @@ export default function AutoUpdater(props: Props) {
         {updateState === UpgradeStatus.NONE && (
           <>
             <UpdateIntroduction />
-            <UpdateButton />
+            <UpdateButton
+              updateState={updateState}
+              performUpdate={performUpdate}
+              version={version}
+            />
           </>
         )}
 
-        {updateState !== UpgradeStatus.NONE && <UpdateConsole />}
+        {updateState !== UpgradeStatus.NONE && (
+          <UpdateConsole
+            updateLog={updateLog}
+            updateState={updateState}
+            getUpdateStatusText={getUpdateStatusText}
+          />
+        )}
 
         <Spin spinning={restartStatus === RestartStatus.AUTO_RESTART_EXECUTING}>
           <Space direction="vertical">
             <Text type={restartMessageTextType}>{getRestartStatusText()}</Text>
             {(restartStatus === RestartStatus.AUTO_RESTART_PENDING ||
-              restartStatus === RestartStatus.AUTO_RESTART_CONFIRM) && <RestartButton />}
+              restartStatus === RestartStatus.AUTO_RESTART_CONFIRM) && (
+              <RestartButton restartButtonPressed={restartButtonPressed} />
+            )}
           </Space>
         </Spin>
       </Space>

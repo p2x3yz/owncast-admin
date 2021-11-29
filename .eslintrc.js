@@ -26,11 +26,19 @@ module.exports = {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
     'no-console': 'off',
-
+    'react/no-unescaped-entities': 'off',
     'no-use-before-define': [0],
     '@typescript-eslint/no-use-before-define': [1],
 
     'react/jsx-no-target-blank': [1, { allowReferrer: false, enforceDynamicLinks: 'always' }],
+
+    'react/function-component-definition': [
+      2,
+      {
+        namedComponents: 'function-declaration',
+      },
+    ],
+
     'import/extensions': [
       'error',
       'ignorePackages',
