@@ -107,7 +107,7 @@ export const TEXTFIELD_PROPS_STREAM_KEY = {
   apiPath: API_STREAM_KEY,
   configPath: '',
   maxLength: TEXT_MAXLENGTH,
-  placeholder: 'abc123',
+  placeholder: 'bilby baxter',
   label: 'Stream Key',
   tip: 'Save this key somewhere safe, you will need it to stream or login to the admin dashboard!',
   required: true,

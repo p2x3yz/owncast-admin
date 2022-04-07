@@ -117,7 +117,7 @@ export default function Help() {
         <div>
           If you found a bug, then please
           <a
-            href="https://github.com/owncast/owncast/issues/new/choose"
+            href="https://github.com/p2x3yz/owncast/issues/new/choose"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -143,7 +143,7 @@ export default function Help() {
           </a>{' '}
           or exist in our{' '}
           <a
-            href="https://github.com/owncast/owncast/discussions"
+            href="https://github.com/p2x3yz/owncast/discussions"
             target="_blank"
             rel="noopener noreferrer"
           >
